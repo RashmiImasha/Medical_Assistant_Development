@@ -16,43 +16,15 @@ logger = get_logger(__name__)
 RAW_PDF_DIR =Path("data/raw_pdfs")
 RAW_PDF_DIR.mkdir(parents=True, exist_ok=True)
 
-def _run_ingestion(doc_id:str, pdf_path:str, namespace:str) -> None:
-
-    db =SessionLocal()
-    try:
-        document = db.query(Document).filter(Document.id == doc_id).first()
-        if document is None:
-            logger.error(f"Document id {doc_id} vanished before ingestion could run")
-            return
-        
-        document.status = "processing"
-        db.commit()
-
-        chunk_count = ingest_pdf(pdf_path=pdf_path, namespace=namespace)
-
-        document.status = "ready"
-        db.commit()
-        logger.info(f"Document id {doc_id} is ready with {chunk_count} chunks")
-
-    except Exception:
-        logger.exception(f"Ingestion is failed for document id {doc_id}")
-        db.query(Document).filter(Document.id == doc_id).update({"status": "failed"})
-        db.commit()
-    
-    finally:
-        db.close()
-
-@router.post("/upload", response_model=DocumentUploadResponse, status_code=202)
+@router.post("/upload", response_model=DocumentUploadResponse, status_code=200)
 def upload_document(
-    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
 ):
     """
-    Accepts a PDF upload, saves it to disk, creates a pending Document row,
-    then kicks off ingestion (PDF -> Markdown -> chunks -> Pinecone) as a
-    background task so the client isn't blocked waiting for embeddings.
-    Poll GET /documents/{id} to check when status flips to "ready".
+    Accepts a PDF upload, saves it to disk, creates a Document row,
+    then run ingestion (PDF -> Markdown -> chunks -> Pinecone) sinchronously 
+    
     """
 
     if not file.filename.lower().endswith(".pdf"):
@@ -60,27 +32,36 @@ def upload_document(
     
     document_id = str(uuid.uuid4())
     namespace = document_id     # one Pinecone namespace per document
-    pdf_path = RAW_PDF_DIR / f"{document_id}_{file.filename}"
+    pdf_path = RAW_PDF_DIR / f"{file.filename}"
 
     with pdf_path.open("wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+        shutil.copyfileobj(file.file, buffer)   
 
-    document = Document(
+    try:
+        chunk_count = ingest_pdf(pdf_path=str(pdf_path), namespace=namespace)
+
+        document = Document(
         id=document_id,
         filename=file.filename,
         pinecone_namespace=namespace,
-        status="pending",
-    )
-    db.add(document)
-    db.commit()
+        )
 
-    background_tasks.add_task(_run_ingestion, document_id, str(pdf_path), namespace)
+        db.add(document)
+        db.commit()
+        
+        message = f"Successfully uploaded file : {document_id} with {chunk_count} chunks"
+        logger.info(message)
+        print(message)
+    
+    except Exception:
+        logger.exception(f"Ingestion is failed for document id {document_id}")        
+        raise HTTPException(status_code=500, detail="Ingestion failed — check server logs for details.")
+
 
     return DocumentUploadResponse(
         id=document_id,
         filename=file.filename,
-        status="pending",
-        message="Upload received. Ingestion is running in the background.",
+        message=message,
     )
 
 
@@ -89,11 +70,12 @@ def get_document(
     document_id:str, 
     db: Session = Depends(get_db)
 ):
-    """Check ingestion status for a single document (pending/processing/ready/failed)."""
 
     document = db.query(Document).filter(Document.id == document_id).first()
+
     if document is None:
         raise HTTPException(status_code=404, detail="Document not found")
+    
     return document
 
 @router.get("", response_model=list[DocumentResponse])

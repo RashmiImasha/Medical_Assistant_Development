@@ -14,6 +14,7 @@ def configure_logging() -> None:
         format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
         stream=sys.stdout,
+        force=True
     )
  
     # Quiet down noisy third-party loggers unless we're debugging

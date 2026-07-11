@@ -5,7 +5,6 @@ class DocumentUploadResponse(BaseModel):
 
     id:str
     filename:str
-    status: str
     message: str
 
 class DocumentResponse(BaseModel):
@@ -17,5 +16,4 @@ class DocumentResponse(BaseModel):
     id: str
     filename: str
     pinecone_namespace: str
-    status: str
     uploaded_at: datetime

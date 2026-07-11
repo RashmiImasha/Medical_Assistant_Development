@@ -12,12 +12,13 @@ langchain-core==1.4.0
 langchain-google-genai
 langchain-community==0.4.2
 
-langchain-experimental==0.4.2
 langchain-pinecone
 
 langchain-huggingface
-sentence-transformers
-torch
+fastembed
+
+
+
 # langchain-google-genai
 langchain-text-splitters
 

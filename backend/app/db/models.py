@@ -15,7 +15,6 @@ class Document(Base):
     id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     filename: Mapped[str] = mapped_column(String, nullable=False)
     pinecone_namespace: Mapped[str] = mapped_column(String, nullable=False)
-    status: Mapped[str] = mapped_column(String, default="pending")  # pending | processing | ready | failed
     uploaded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
  
     # kpis: Mapped[list["KPI"]] = relationship(back_populates="document", cascade="all, delete-orphan")

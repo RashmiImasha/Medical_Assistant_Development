@@ -24,8 +24,8 @@ class Settings(BaseSettings):
     pinecone_region: str = "us-east-1"
  
     # Groq (LLM)
-    groq_api_key: str
-    groq_model: str = "llama-3.3-70b-versatile"
+    # groq_api_key: str
+    # groq_model: str = "llama-3.3-70b-versatile"
  
     @property
     def cors_origins_list(self) -> list[str]:

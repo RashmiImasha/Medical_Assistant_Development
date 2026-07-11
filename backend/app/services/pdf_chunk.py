@@ -1,6 +1,31 @@
 from pathlib import Path
+import pymupdf4llm
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+def convert_pdf_to_markdown(self, pdf_path:str, output_dir:str) -> str:
+    """
+        pdf_path: Source PDF path.
+        output_dir: Output markdown directory.
+
+    Returns:
+        Generated markdown file path.
+    """
+
+    pdf_file = Path(pdf_path)
+    if not pdf_file.exists():
+        raise FileNotFoundError(f"PDF File not found: {pdf_path}")
+    
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    markdown_content = pymupdf4llm.to_markdown(str(pdf_file))
+
+    markdown_file = output_path / f"{pdf_file.stem}.md"
+    markdown_file.write_text(markdown_content, encoding="utf-8")
+
+    return str(markdown_file)
+
 
 def read_markdown(markdown_file: str) -> str:
 
@@ -15,17 +40,13 @@ def read_markdown(markdown_file: str) -> str:
     """
     return Path(markdown_file).read_text(encoding="utf-8")
 
-def chunk_markdown(markdown_file: str, chunk_size:int =500, chunk_overlap: int = 150) -> list[Document]:
+def chunk_markdown(markdown_file: str, chunk_size:int =300, chunk_overlap: int = 80) -> list[Document]:
 
     """
     Generate semantic chunks from markdown.
  
     Args:
-        markdown_file: Markdown file path.
-        embeddings: Any LangChain-compatible embeddings object — here, our
-            Gemini embeddings from services/embeddings.py. SemanticChunker
-            uses embedding distance between sentences to decide chunk
-            boundaries, so it needs a live embeddings model, not just text.
+        markdown_file: Markdown file path.        
  
     Returns:
         List of semantic chunks as LangChain Documents.

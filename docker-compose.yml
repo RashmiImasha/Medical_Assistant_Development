@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: investor_platform_db
+    environment:
+      POSTGRES_USER: investor_user
+      POSTGRES_PASSWORD: investor_pass
+      POSTGRES_DB: investor_platform
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    container_name: investor_platform_adminer
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
