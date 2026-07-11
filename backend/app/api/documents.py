@@ -55,7 +55,7 @@ def upload_document(
     Poll GET /documents/{id} to check when status flips to "ready".
     """
 
-    if not file.filename.lower().endswith("*.pdf"):
+    if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only pdf files are supported")
     
     document_id = str(uuid.uuid4())

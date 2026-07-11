@@ -51,12 +51,12 @@ def ingest_pdf(pdf_path:str, namespace:str) -> int:
     converter = PDFToMarkdownConverter()
     markdown_file = converter.convert_pdf(pdf_path=pdf_path, output_dir=MARKDOWN_OUTPUT_DIR)
 
-    embeddings = get_embedding_model()
-    chunks = chunk_markdown(markdown_file=markdown_file, embeddings=embeddings)
+    chunks = chunk_markdown(markdown_file=markdown_file)
 
     for chunk in chunks:
         chunk.metadata.update({"company":company, "year":year, "source_file":pdf_file.name})
     
+    embeddings = get_embedding_model()
     vectore_db = get_vector_db(embeddings)
     vectore_db.add_documents(documents=chunks, namespace=namespace)
 

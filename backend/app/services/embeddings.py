@@ -1,11 +1,11 @@
-from langchain_voyageai import VoyageAIEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from app.core.config import get_settings
 
 settings = get_settings()
 
-def get_embedding_model() -> VoyageAIEmbeddings:
+def get_embedding_model() -> HuggingFaceEmbeddings:
 
-    return VoyageAIEmbeddings(
-        model = settings.voyage_embedding_model,
-        voyage_api_key = settings.voyage_api_key,
+    return HuggingFaceEmbeddings(
+        model_name = settings.huggingface_embed_model,
+        encode_kwargs={"normalize_embeddings": True},
     )

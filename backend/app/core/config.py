@@ -15,8 +15,7 @@ class Settings(BaseSettings):
     database_url: str
  
     # Gemini (embeddings)
-    voyage_api_key: str
-    voyage_embedding_model: str = "voyage-4-large"
+    huggingface_embed_model: str = "sentence-transformers/all-MiniLM-L6-v2"
  
     # Pinecone (vector store)
     pinecone_api_key: str

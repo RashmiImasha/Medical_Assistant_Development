@@ -5,7 +5,7 @@ from app.core.config import get_settings
 from app.core.logging import get_logger
 
 settings = get_settings()
-logger = get_logger()
+logger = get_logger(__name__)
 
 _pinecone_client = Pinecone(api_key=settings.pinecone_api_key)
 
@@ -18,7 +18,7 @@ def ensure_db_exists() -> None:
         logger.info("Creating Pinecone index: %s", settings.pinecone_index_name)
         _pinecone_client.create_index(
             name=settings.pinecone_index_name,
-            dimension=1024,
+            dimension=384,
             metric="cosine",
             spec=ServerlessSpec(cloud=settings.pinecone_cloud, region=settings.pinecone_region)
         )
