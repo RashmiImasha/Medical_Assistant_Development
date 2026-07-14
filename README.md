@@ -1,1 +1,1 @@
-# Medical_Assistant_Development
+# AI_Powered_Investor_Platform
