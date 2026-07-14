@@ -18,8 +18,6 @@ langchain-huggingface
 fastembed
 
 
-
-# langchain-google-genai
 langchain-text-splitters
 
 pinecone

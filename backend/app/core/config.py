@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     # PostgreSQL
     database_url: str
  
-    # Gemini (embeddings)
+    # embeddings
     huggingface_embed_model: str = "sentence-transformers/all-MiniLM-L6-v2"
  
     # Pinecone (vector store)
@@ -24,8 +24,8 @@ class Settings(BaseSettings):
     pinecone_region: str = "us-east-1"
  
     # Groq (LLM)
-    # groq_api_key: str
-    # groq_model: str = "llama-3.3-70b-versatile"
+    groq_api_key: str
+    groq_model: str = "llama-3.3-70b-versatile"
  
     @property
     def cors_origins_list(self) -> list[str]:

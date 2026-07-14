@@ -3,7 +3,7 @@ import pymupdf4llm
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-def convert_pdf_to_markdown(self, pdf_path:str, output_dir:str) -> str:
+def convert_pdf_to_markdown(pdf_path:str, output_dir:str) -> str:
     """
         pdf_path: Source PDF path.
         output_dir: Output markdown directory.

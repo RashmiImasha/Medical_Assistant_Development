@@ -12,16 +12,22 @@ settings = get_settings()
 logger = get_logger(__name__)
 MARKDOWN_OUTPUT_DIR = "data/markdown"
 
-_pinecone_client = Pinecone(api_key=settings.pinecone_api_key)
+def get_pinecone_client():
+
+    return Pinecone(
+        api_key=settings.pinecone_api_key
+    )
 
 def ensure_db_exists() -> None:
 
-    existing_indexes = [index["name"] for index in _pinecone_client.list_indexes()]
+    pinecone_client = get_pinecone_client()
+
+    existing_indexes = [index["name"] for index in pinecone_client.list_indexes()]
 
     if settings.pinecone_index_name not in existing_indexes:
 
         logger.info(f"Creating Pinecone index: {settings.pinecone_index_name} ")
-        _pinecone_client.create_index(
+        pinecone_client.create_index(
             name=settings.pinecone_index_name,
             dimension=384,
             metric="cosine",
@@ -30,8 +36,10 @@ def ensure_db_exists() -> None:
 
 def get_vector_db(embeddings) -> PineconeVectorStore:
 
+    pinecone_client = get_pinecone_client()
+
     ensure_db_exists()
-    index = _pinecone_client.Index(settings.pinecone_index_name)
+    index = pinecone_client.Index(settings.pinecone_index_name)
     
     return PineconeVectorStore(index=index, embedding=embeddings)
 
@@ -104,7 +112,5 @@ def ingest_pdf(pdf_path:str, namespace:str) -> int:
     print(ingest_msg)
 
     return len(chunks)
-
-
 
 

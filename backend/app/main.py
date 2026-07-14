@@ -9,7 +9,9 @@ load_dotenv()
 from app.core.config import get_settings
 from app.core.logging import get_logger
 from app.db.database import Base, engine
+from app.db.models import Document
 from app.api.documents import router as documents_router
+from app.api.dashboard import router as dashboard_router
 
 settings = get_settings()
 logger = get_logger(__name__)
@@ -36,6 +38,7 @@ app.add_middleware(
 )
 
 app.include_router(documents_router)
+app.include_router(dashboard_router)
 
 @app.get("/health")
 def health():
